@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: oom-test
+  namespace: lxx
+data:
+  args: '50'  #参数代表申请消耗内存大小，单位为Mi
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mem-demo
+  namespace: lxx
+  labels:
+    app: mem-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mem-demo
+  template:
+    metadata:
+      labels:
+        app: mem-demo
+    spec:
+      containers:
+      - name: mem-demo-ctr
+        image: registry.steam.crcloud.com/rancher/lxx/mem_alloc:v2
+        imagePullPolicy: IfNotPresent
+        command: ["/mem_alloc", $(ARGS)]
+        env:
+        - name: ARGS
+          valueFrom:
+            configMapKeyRef:
+              name: oom-test
+              key: args
+      nodeSelector:
+        test: mem
