@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: example
+  namespace: lxx
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: role-example
+  namespace: lxx
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: rolebindding-example
+  namespace: lxx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: role-example
+subjects:
+- kind: ServiceAccount
+  name: example
+  namespace: lxx
