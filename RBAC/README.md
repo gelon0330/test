@@ -1,5 +1,7 @@
 0.创建serviceaccount
+
 kubectl  create sa -n lxx example
+
 0.1 在pod内使用serviceaccount，只需要指定ServiceAccount的名称即可
 
 
