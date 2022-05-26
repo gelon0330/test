@@ -1,1 +1,2 @@
 nginx 发布目录通过pvc挂载
+简单的持久化可以使用emptyDir

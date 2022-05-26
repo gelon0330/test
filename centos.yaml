@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test
+spec:
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+      - name: test
+        image: registry.steam.crcloud.com/docker/rancher/centostools:v1
+        command: ["top","-b"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testdns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: testdns
+  template:
+    metadata:
+      labels:
+        app: testdns
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - testdns
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - name: testdnsctr
+        image: registry.cn-hangzhou.aliyuncs.com/google_containers/busybox
+        command: ["sleep","3600"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-pv
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: registry.steam.crcloud.com/rancher/lxx/nginx:1.21.4
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-pv
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: nginx
