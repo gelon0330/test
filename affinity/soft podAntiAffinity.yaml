@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edge-nginx
+  labels:
+    app: edge-nginx
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: edge-nginx
+  template:
+    metadata:
+      labels:
+        app: edge-nginx
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - edge-nginx
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: edge-nginx
+        image: registry.steam.crcloud.com/rancher/nginx:latest
+        ports:
+        - containerPort: 80
